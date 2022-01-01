@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public GameObject[] btns = {};
     public ArrayList colors = new ArrayList();
     public Text HighScore;
+    public Text CurrentScore;
     private int counter;
     private int rnd;
     private int ans_num;
@@ -74,7 +75,6 @@ public class GameManager : MonoBehaviour
         counter = 0;
         score = 0f;
         btns[4].SetActive(false);
-        HighScore.gameObject.SetActive(false);
         for (int j = 0; j < 4; j++)
         {
             btns[j].SetActive(true);
@@ -94,9 +94,6 @@ public class GameManager : MonoBehaviour
             }
             ColorText.fontSize = 80;
             ColorText.text = "Scores:" + score.ToString("F0");
-            high_score = Mathf.Max(high_score, score);
-            HighScore.text = string.Format("High Score: {0}", high_score.ToString("F0"));
-            HighScore.gameObject.SetActive(true);
             btns[4].SetActive(true);
             btns[4].GetComponentInChildren<Text>().text = "restart";
             timer = -999999999;
@@ -129,6 +126,9 @@ public class GameManager : MonoBehaviour
     {
         point = Mathf.Pow(((3.5f - timer) / 3f), 2f) * 100;
         score += Mathf.Min(point, 100f);
+        CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
+        high_score = Mathf.Max(high_score, score);
+        HighScore.text = string.Format("High Score: {0}", high_score.ToString("F0"));
     }
     void ChangeColor(string Ans_color)
     {
