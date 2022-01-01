@@ -7,11 +7,13 @@ using UnityEngine.EventSystems;
 public class GameManager : MonoBehaviour
 {
     public Text ColorText;
+    public Text CorrectAnswer;
     public GameObject[] btns = {};
     public ArrayList colors = new ArrayList();
     public Text HighScore;
     public Text CurrentScore;
-    private int counter;
+    public Slider TimeBar;
+    private int[] counter = { 0, 0 };
     private int rnd;
     private int ans_num;
     private int rnd_btn;
@@ -64,6 +66,8 @@ public class GameManager : MonoBehaviour
             btns[j].SetActive(false);
         }
         btns[4].GetComponent<Button>().onClick.AddListener(GameStart);
+        btns[5].GetComponent<Button>().onClick.AddListener(GameStart);
+        TimeBar.gameObject.SetActive(false);
         timer = -999999999;
     }
 
@@ -72,13 +76,16 @@ public class GameManager : MonoBehaviour
     {
         ColorText.fontSize = 100;
         timer = 0;
-        counter = 0;
+        counter[0] = 0;
         score = 0f;
+        CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
         btns[4].SetActive(false);
+        CorrectAnswer.text = "";
         for (int j = 0; j < 4; j++)
         {
             btns[j].SetActive(true);
         }
+        TimeBar.gameObject.SetActive(true);
         NextQuestion();
     }
     
@@ -86,23 +93,26 @@ public class GameManager : MonoBehaviour
     // if 20 questions are played, then show the final score and restart button
     private void Update()
     {
-        if (counter == 20)
+        if (counter[0] == 20)
         {
             for (int j = 0; j < 4; j++)
             {
                 btns[j].SetActive(false);
             }
-            ColorText.fontSize = 80;
+            ColorText.fontSize = 50;
             ColorText.text = "Scores:" + score.ToString("F0");
+            CorrectAnswer.text = "Correct Answer:" + counter[1].ToString();
             btns[4].SetActive(true);
             btns[4].GetComponentInChildren<Text>().text = "restart";
+            TimeBar.gameObject.SetActive(false);
             timer = -999999999;
         }
         else if (timer <= 3)
         {
             timer += Time.deltaTime;
+            TimeBar.value = timer / 3f;
         }
-        if (timer > 3)
+        else if (timer > 3)
         {
             timer = 0;
             NextQuestion();
@@ -117,7 +127,7 @@ public class GameManager : MonoBehaviour
         ans_num = (Random.Range(0, 100) % 10);
         ChangeColor(colors[ans_num].ToString());
         SetButton();
-        counter++;
+        counter[0]++;
     }
 
     // highest points for each question is 100, the points decays exponentially, the lowest point for correct answer is 100/36 (around 3) point
@@ -168,6 +178,7 @@ public class GameManager : MonoBehaviour
         if (EventSystem.current.currentSelectedGameObject.GetComponentInChildren<Text>().text == colors[ans_num].ToString())
         {
             CountScore();
+            counter[1]++;
         }
         timer = 0;
         NextQuestion();
