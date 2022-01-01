@@ -130,11 +130,11 @@ public class GameManager : MonoBehaviour
         counter[0]++;
     }
 
-    // highest points for each question is 100, the points decays exponentially, the lowest point for correct answer is 100/36 (around 3) point
-    // if correct answer in selected in 0.5 second, then player get 100 point
+    // highest points for each question is 100, the points decays exponentially, the lowest point for correct answer is 100/9 (around 11) point
+    // if correct answer in selected in 1 second, then player get 100 point
     void CountScore()
     {
-        point = Mathf.Pow(((3.5f - timer) / 3f), 2f) * 100;
+        point = Mathf.Pow(((4f - timer) / 3f), 2f) * 100;
         score += Mathf.Min(point, 100f);
         CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
         high_score = Mathf.Max(high_score, score);
