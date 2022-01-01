@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
             }
             ColorText.fontSize = 50;
             ColorText.text = "Scores:" + score.ToString("F0");
-            CorrectAnswer.text = "Correct Answer:" + counter[1].ToString();
+            CorrectAnswer.text = "Correct Answer:" + counter[1].ToString() + "/20";
             btns[4].SetActive(true);
             btns[4].GetComponentInChildren<Text>().text = "restart";
             TimeBar.gameObject.SetActive(false);
