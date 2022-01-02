@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class GameManager : MonoBehaviour
     public Text HighScore;
     public Text CurrentScore;
     public Slider TimeBar;
+    public GameObject MainScene;
+    public GameObject IntroScene;
     private bool InGamePlay;
     private int question_played;
     private int correct_count;
@@ -72,6 +75,7 @@ public class GameManager : MonoBehaviour
         }
         btns[StartBtn].GetComponent<Button>().onClick.AddListener(GameStart);
         btns[ReturnTitleBtn].GetComponent<Button>().onClick.AddListener(title);
+        btns[IntroBtn].GetComponent<Button>().onClick.AddListener(LoadIntroScenes);
         HideObject(btns[ReturnTitleBtn]);
         HideObject(TimeBar.gameObject);
         InGamePlay = false;
@@ -89,6 +93,8 @@ public class GameManager : MonoBehaviour
         ColorText.text = "Color Game";
         btns[StartBtn].GetComponentInChildren<Text>().text = "Start";
         ShowObject(btns[StartBtn]);
+        ShowObject(btns[IntroBtn]);
+        CorrectAnswer.text = "";
     }
     // Game starts, reset all parameters needed and set the first question
     void GameStart()
@@ -100,7 +106,9 @@ public class GameManager : MonoBehaviour
         correct_count = 0;
         score = 0f;
         CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
+        ShowObject(btns[ReturnTitleBtn]);
         HideObject(btns[StartBtn]);
+        HideObject(btns[IntroBtn]);
         CorrectAnswer.text = "";
         for (int j = 0; j < 4; j++)
         {
@@ -216,6 +224,11 @@ public class GameManager : MonoBehaviour
         }
         timer = 0;
         NextQuestion();
+    }
+
+    public void LoadIntroScenes()
+    {
+        SceneManager.LoadScene("Introduction");
     }
 }
 
