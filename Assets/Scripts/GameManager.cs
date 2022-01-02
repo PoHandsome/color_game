@@ -9,13 +9,12 @@ public class GameManager : MonoBehaviour
 {
     public Text ColorText;
     public Text CorrectAnswer;
-    public GameObject[] btns = {};
+    public GameObject[] btns = {};  // 0 = Left, 1 = Up, 2 = Right, 3 = Down
+    public KeyCode[] keys = {};     // 0 = Left, 1 = Up, 2 = Right, 3 = Down
     public ArrayList colors = new ArrayList();
     public Text HighScore;
     public Text CurrentScore;
     public Slider TimeBar;
-    public GameObject MainScene;
-    public GameObject IntroScene;
     private bool InGamePlay;
     private int question_played;
     private int correct_count;
@@ -142,6 +141,13 @@ public class GameManager : MonoBehaviour
             {
                 timer += Time.deltaTime;
                 TimeBar.value = timer / 3f;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (Input.GetKeyDown(keys[i]))
+                    {
+                        CheckAnswerKey(i);
+                    }
+                }
             }
             else if (timer > 3)
             {
@@ -218,6 +224,17 @@ public class GameManager : MonoBehaviour
     void CheckAnswer()
     {
         if (EventSystem.current.currentSelectedGameObject.GetComponentInChildren<Text>().text == colors[ans_num].ToString())
+        {
+            CountScore();
+            correct_count++;
+        }
+        timer = 0;
+        NextQuestion();
+    }
+
+    void CheckAnswerKey(int i)
+    {
+        if (btns[i].GetComponentInChildren<Text>().text == colors[ans_num].ToString())
         {
             CountScore();
             correct_count++;
