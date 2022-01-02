@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public Text CurrentScore;
     public Slider TimeBar;
     private bool InGamePlay;
+    private float question_time = 3f;
+    private int total_questions = 20;
     private int question_played;
     private int correct_count;
     private int rnd;
@@ -123,7 +125,7 @@ public class GameManager : MonoBehaviour
     {
         if (InGamePlay)
         {
-            if (question_played == 20)
+            if (question_played == total_questions)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -137,19 +139,20 @@ public class GameManager : MonoBehaviour
                 HideObject(TimeBar.gameObject);
                 InGamePlay = false;
             }
-            else if (timer <= 3)
+            else if (timer <= question_time)
             {
                 timer += Time.deltaTime;
-                TimeBar.value = timer / 3f;
+                TimeBar.value = timer / question_time;
                 for (int i = 0; i < 4; i++)
                 {
                     if (Input.GetKeyDown(keys[i]))
                     {
                         CheckAnswerKey(i);
+                        break;
                     }
                 }
             }
-            else if (timer > 3)
+            else if (timer > question_time)
             {
                 timer = 0;
                 NextQuestion();
@@ -182,7 +185,7 @@ public class GameManager : MonoBehaviour
     // if correct answer in selected in 1 second, then player get 100 point
     void CountScore()
     {
-        point = Mathf.Pow(((4f - timer) / 3f), 2f) * 100;
+        point = Mathf.Pow(((question_time + 1f - timer) / question_time), 2f) * 100;
         score += Mathf.Min(point, 100f);
         CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
         high_score = Mathf.Max(high_score, score);
