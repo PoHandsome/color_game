@@ -66,17 +66,31 @@ public class GameManager : MonoBehaviour
             btns[j].SetActive(false);
         }
         btns[4].GetComponent<Button>().onClick.AddListener(GameStart);
-        btns[5].GetComponent<Button>().onClick.AddListener(GameStart);
+        btns[5].GetComponent<Button>().onClick.AddListener(title);
         TimeBar.gameObject.SetActive(false);
         timer = -999999999;
     }
 
+    void title()
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            btns[j].SetActive(false);
+        }
+        TimeBar.gameObject.SetActive(false);
+        timer = -999999999;
+        ColorText.fontSize = 80;
+        ColorText.text = "Color Game";
+        btns[4].GetComponentInChildren<Text>().text = "Start";
+        btns[4].SetActive(true);
+    }
     // Game starts, reset all parameters needed and set the first question
     void GameStart()
     {
         ColorText.fontSize = 100;
         timer = 0;
         counter[0] = 0;
+        counter[1] = 0;
         score = 0f;
         CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
         btns[4].SetActive(false);
@@ -103,7 +117,7 @@ public class GameManager : MonoBehaviour
             ColorText.text = "Scores:" + score.ToString("F0");
             CorrectAnswer.text = "Correct Answer:" + counter[1].ToString() + "/20";
             btns[4].SetActive(true);
-            btns[4].GetComponentInChildren<Text>().text = "restart";
+            btns[4].GetComponentInChildren<Text>().text = "Restart";
             TimeBar.gameObject.SetActive(false);
             timer = -999999999;
         }
