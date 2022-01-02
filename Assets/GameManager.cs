@@ -13,10 +13,15 @@ public class GameManager : MonoBehaviour
     public Text HighScore;
     public Text CurrentScore;
     public Slider TimeBar;
-    private int[] counter = { 0, 0 };
+    private bool InGamePlay;
+    private int question_played;
+    private int correct_count;
     private int rnd;
     private int ans_num;
     private int rnd_btn;
+    int StartBtn = 4;
+    int ReturnTitleBtn = 5;
+    int IntroBtn = 6;
     int[] ans_options = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     float point;
     float score;
@@ -63,12 +68,13 @@ public class GameManager : MonoBehaviour
         for (int j = 0; j < 4; j++)
         {
             btns[j].GetComponent<Button>().onClick.AddListener(CheckAnswer);
-            btns[j].SetActive(false);
+            HideObject(btns[j]);
         }
-        btns[4].GetComponent<Button>().onClick.AddListener(GameStart);
-        btns[5].GetComponent<Button>().onClick.AddListener(title);
-        TimeBar.gameObject.SetActive(false);
-        timer = -999999999;
+        btns[StartBtn].GetComponent<Button>().onClick.AddListener(GameStart);
+        btns[ReturnTitleBtn].GetComponent<Button>().onClick.AddListener(title);
+        HideObject(btns[ReturnTitleBtn]);
+        HideObject(TimeBar.gameObject);
+        InGamePlay = false;
     }
 
     void title()
@@ -77,29 +83,30 @@ public class GameManager : MonoBehaviour
         {
             btns[j].SetActive(false);
         }
-        TimeBar.gameObject.SetActive(false);
-        timer = -999999999;
+        HideObject(TimeBar.gameObject);
+        InGamePlay = false;
         ColorText.fontSize = 80;
         ColorText.text = "Color Game";
-        btns[4].GetComponentInChildren<Text>().text = "Start";
-        btns[4].SetActive(true);
+        btns[StartBtn].GetComponentInChildren<Text>().text = "Start";
+        ShowObject(btns[StartBtn]);
     }
     // Game starts, reset all parameters needed and set the first question
     void GameStart()
     {
+        InGamePlay = true;
         ColorText.fontSize = 100;
         timer = 0;
-        counter[0] = 0;
-        counter[1] = 0;
+        question_played = 0;
+        correct_count = 0;
         score = 0f;
         CurrentScore.text = string.Format("Score: {0}", score.ToString("F0"));
-        btns[4].SetActive(false);
+        HideObject(btns[StartBtn]);
         CorrectAnswer.text = "";
         for (int j = 0; j < 4; j++)
         {
-            btns[j].SetActive(true);
+            ShowObject(btns[j]);
         }
-        TimeBar.gameObject.SetActive(true);
+        ShowObject(TimeBar.gameObject);
         NextQuestion();
     }
     
@@ -107,32 +114,45 @@ public class GameManager : MonoBehaviour
     // if 20 questions are played, then show the final score and restart button
     private void Update()
     {
-        if (counter[0] == 20)
+        if (InGamePlay)
         {
-            for (int j = 0; j < 4; j++)
+            if (question_played == 20)
             {
-                btns[j].SetActive(false);
+                for (int j = 0; j < 4; j++)
+                {
+                    HideObject(btns[j]);
+                }
+                ColorText.fontSize = 50;
+                ColorText.text = "Scores:" + score.ToString("F0");
+                CorrectAnswer.text = "Correct Answer:" + correct_count.ToString() + "/20";
+                btns[StartBtn].GetComponentInChildren<Text>().text = "Restart";
+                ShowObject(btns[StartBtn]);
+                HideObject(TimeBar.gameObject);
+                InGamePlay = false;
             }
-            ColorText.fontSize = 50;
-            ColorText.text = "Scores:" + score.ToString("F0");
-            CorrectAnswer.text = "Correct Answer:" + counter[1].ToString() + "/20";
-            btns[4].SetActive(true);
-            btns[4].GetComponentInChildren<Text>().text = "Restart";
-            TimeBar.gameObject.SetActive(false);
-            timer = -999999999;
+            else if (timer <= 3)
+            {
+                timer += Time.deltaTime;
+                TimeBar.value = timer / 3f;
+            }
+            else if (timer > 3)
+            {
+                timer = 0;
+                NextQuestion();
+            }
         }
-        else if (timer <= 3)
-        {
-            timer += Time.deltaTime;
-            TimeBar.value = timer / 3f;
-        }
-        else if (timer > 3)
-        {
-            timer = 0;
-            NextQuestion();
-        }
+        
     }
 
+    //Show and hide objects
+    void ShowObject(GameObject btn)
+    {
+        btn.SetActive(true);
+    }
+    void HideObject(GameObject btn)
+    {
+        btn.SetActive(false);
+    }
     // reset question text and buttons
     // store the ans_num to retrieve the answer from colors array and prevent duplicate texts for buttons, for further details see SetButton()
     void NextQuestion()
@@ -141,7 +161,7 @@ public class GameManager : MonoBehaviour
         ans_num = (Random.Range(0, 100) % 10);
         ChangeColor(colors[ans_num].ToString());
         SetButton();
-        counter[0]++;
+        question_played++;
     }
 
     // highest points for each question is 100, the points decays exponentially, the lowest point for correct answer is 100/9 (around 11) point
@@ -192,7 +212,7 @@ public class GameManager : MonoBehaviour
         if (EventSystem.current.currentSelectedGameObject.GetComponentInChildren<Text>().text == colors[ans_num].ToString())
         {
             CountScore();
-            counter[1]++;
+            correct_count++;
         }
         timer = 0;
         NextQuestion();
